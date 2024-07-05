@@ -1,0 +1,6 @@
+*.log
+prompts/
+*_venv
+.env
+out/
+__pycache__/

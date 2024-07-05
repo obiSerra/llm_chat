@@ -1,0 +1,17 @@
+[project]
+name = "llm_client"
+description = ""
+version = "0.1.0"
+authors = [
+    { name = "Roberto Serra", email = "obi.serra@gmail.com" }
+]
+dependencies = [
+    "requests"
+]
+
+[project.optional-dependencies]
+dev = []
+
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.2,<4"]
