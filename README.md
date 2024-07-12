@@ -14,3 +14,10 @@
 ## Run
 
 Run `$ bash chat.sh`
+
+or use a specific configuration with 
+`$ bash chat.sh --config <config-file-name>`
+
+eg:
+
+`$ bash chat.sh --config hal9001` if you have a `hal9001.json` config file in the project root

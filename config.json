@@ -1,0 +1,5 @@
+{
+    "model": "mistral",
+    "name": "assistant",
+    "system-prompt": "You are an helpful AI named {name}."
+}

@@ -4,3 +4,6 @@ prompts/
 .env
 out/
 __pycache__/
+
+*config.json
+!config.json

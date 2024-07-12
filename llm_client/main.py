@@ -1,3 +1,4 @@
+import json
 import re
 import sys
 import requests
@@ -6,9 +7,8 @@ from llm_client.logger import Logger
 import subprocess
 
 
-
-
-CHAT_URL = " http://localhost:11434/api/chat"
+BASE_URL = "http://localhost:11434"
+CHAT_URL = f"{BASE_URL}/api/chat"
 MODEL = "mistral"
 
 
@@ -22,30 +22,64 @@ MODEL = "mistral"
 # """
 
 
-assistant_system_prompt = """You are an helpful AI assistant named Bernard."""
+logger = Logger("llm_client_chat")
+
+def make_request(messages):
+    r = requests.post(
+        CHAT_URL, json={"model": MODEL, "messages": messages, "stream": False}
+    )
+    response = r.json()
+    logger.info(response)
+    return response
 
 
-def run_chat():
+def print_response(content, name):
+    print(f"{name}: {content}")
 
-    logger = Logger("llm_client_chat")
+
+def read_config(config_file):
+    with open(config_file, "r") as f:
+        config = json.load(f)
+    return config
 
 
-    print("Hello from llm_client!")
+def run_chat(config_file):
+    config = read_config(config_file)
 
-    messages = [{"role": "system", "content": assistant_system_prompt}]
+    name=config.get("name", "AI")
+
+    system_prompt = config.get("system-prompt", "").format(name=name)
+
+    try:
+        r = requests.get(BASE_URL)
+        r.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(
+            "Could not connect to the chat server. Please make sure the server is running."
+        )
+        exit(1)
+
+    print(f"Starting {MODEL}...")
+    messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
+
+    response = make_request(messages)
+
+    message = response["message"]
+    content = message["content"]
+    print_response(content, name)
+    messages.append(message)
 
     try:
         while True:
             prompt = input("-> ")
 
-
             messages.append({"role": "user", "content": prompt})
             print("...")
 
             logger.info(f"Before send messages: {messages}")
-            r = requests.post(CHAT_URL, json={"model": MODEL, "messages": messages, "stream": False})
-            response = r.json()
-            logger.info(response)
+            response = make_request(messages)
             message = response["message"]
             content = message["content"]
             # if content.strip().startswith("EXECUTE_COMMAND:"):
@@ -55,11 +89,10 @@ def run_chat():
             #         print("COMMAND:", cmd)
             #         process = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE)
             #         print(process.stdout.read())
-            print(f"{MODEL}: {content}")
+            print_response(content, name)
 
             messages.append(message)
-            
-        
+
     except KeyboardInterrupt as e:
         print("Quitting now")
         sys.exit(1)
