@@ -9,7 +9,6 @@ import subprocess
 
 BASE_URL = "http://localhost:11434"
 CHAT_URL = f"{BASE_URL}/api/chat"
-MODEL = "mistral"
 
 
 # assistant_system_prompt = """You are an helpful AI assistant named Bernard.
@@ -24,9 +23,9 @@ MODEL = "mistral"
 
 logger = Logger("llm_client_chat")
 
-def make_request(messages):
+def make_request(model, messages):
     r = requests.post(
-        CHAT_URL, json={"model": MODEL, "messages": messages, "stream": False}
+        CHAT_URL, json={"model": model, "messages": messages, "stream": False}
     )
     response = r.json()
     logger.info(response)
@@ -47,6 +46,7 @@ def run_chat(config_file):
     config = read_config(config_file)
 
     name=config.get("name", "AI")
+    model = config["model"]
 
     system_prompt = config.get("system-prompt", "").format(name=name)
 
@@ -59,14 +59,21 @@ def run_chat(config_file):
         )
         exit(1)
 
-    print(f"Starting {MODEL}...")
+    print(f"Starting {model}...")
     messages = []
     if system_prompt:
         messages.append({"role": "system", "content": system_prompt})
 
-    response = make_request(messages)
+    response = make_request(model, messages)
 
-    message = response["message"]
+
+    try:
+        message = response["message"]
+    except Exception:
+        logger.error(f"Response: {response}")
+        print(f"Response: {response}")
+        exit(1)
+    
     content = message["content"]
     print_response(content, name)
     messages.append(message)
@@ -79,7 +86,7 @@ def run_chat(config_file):
             print("...")
 
             logger.info(f"Before send messages: {messages}")
-            response = make_request(messages)
+            response = make_request(model, messages)
             message = response["message"]
             content = message["content"]
             # if content.strip().startswith("EXECUTE_COMMAND:"):
