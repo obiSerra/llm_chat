@@ -1,5 +1,6 @@
 import logging
-
+import os
+from pathlib import Path
 
 class Logger:
     def __init__(self, name, level=logging.INFO, stdout=False):
@@ -9,7 +10,10 @@ class Logger:
         if stdout:
             self.logger.addHandler(logging.StreamHandler())
 
-        f_handler = logging.FileHandler(f"{name}.log", mode="w+")
+        dir_path = Path(__file__).parent.parent
+
+        
+        f_handler = logging.FileHandler(f"{dir_path}/{name}.log", mode="w+")
         f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         f_handler.setFormatter(f_format)
         self.logger.addHandler(f_handler)

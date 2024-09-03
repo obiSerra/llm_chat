@@ -21,9 +21,8 @@ CHAT_URL = f"{BASE_URL}/api/chat"
 # """
 
 
-logger = Logger("llm_client_chat")
 
-def make_request(model, messages):
+def make_request(model, messages, logger):
     r = requests.post(
         CHAT_URL, json={"model": model, "messages": messages, "stream": False}
     )
@@ -48,8 +47,11 @@ def run_chat(config_file):
     name=config.get("name", "AI")
     model = config["model"]
 
-    system_prompt = config.get("system-prompt", "").format(name=name)
+    logger = Logger(f"llm_client_chat-{name}")
 
+    logger.info(f"Config: {config}")
+    system_prompt = config.get("system-prompt", "").format(name=name)
+    logger.info(f"System prompt: {system_prompt}")
     try:
         r = requests.get(BASE_URL)
         r.raise_for_status()
@@ -63,20 +65,20 @@ def run_chat(config_file):
     messages = []
     if system_prompt:
         messages.append({"role": "system", "content": system_prompt})
+        logger.info(f"System prompt: {messages}")
+    # response = make_request(model, messages, logger)
 
-    response = make_request(model, messages)
 
-
-    try:
-        message = response["message"]
-    except Exception:
-        logger.error(f"Response: {response}")
-        print(f"Response: {response}")
-        exit(1)
+    # try:
+    #     message = response["message"]
+    # except Exception:
+    #     logger.error(f"Response: {response}")
+    #     print(f"Response: {response}")
+    #     exit(1)
     
-    content = message["content"]
-    print_response(content, name)
-    messages.append(message)
+    # content = message["content"]
+    # print_response(content, name)
+    # messages.append(message)
 
     try:
         while True:
@@ -86,7 +88,7 @@ def run_chat(config_file):
             print("...")
 
             logger.info(f"Before send messages: {messages}")
-            response = make_request(model, messages)
+            response = make_request(model, messages, logger)
             message = response["message"]
             content = message["content"]
             # if content.strip().startswith("EXECUTE_COMMAND:"):
