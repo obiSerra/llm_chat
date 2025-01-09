@@ -13,7 +13,7 @@ class Logger:
         dir_path = Path(__file__).parent.parent
 
         
-        f_handler = logging.FileHandler(f"{dir_path}/{name}.log", mode="w+")
+        f_handler = logging.FileHandler(f"{dir_path}/logs/{name}.log", mode="w+")
         f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         f_handler.setFormatter(f_format)
         self.logger.addHandler(f_handler)

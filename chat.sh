@@ -9,8 +9,6 @@ if [ -z "$CONFIG" ]; then
     CONFIG="config"
 fi
 
-
-
 source "$SCRIPT_DIR/.env"
 
 $PYTHON_INTERPRETER -m llm_client --config "$SCRIPT_DIR/$CONFIG.json"

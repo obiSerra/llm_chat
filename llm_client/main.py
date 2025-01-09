@@ -21,7 +21,6 @@ CHAT_URL = f"{BASE_URL}/api/chat"
 # """
 
 
-
 def make_request(model, messages, logger):
     r = requests.post(
         CHAT_URL, json={"model": model, "messages": messages, "stream": False}
@@ -44,7 +43,7 @@ def read_config(config_file):
 def run_chat(config_file):
     config = read_config(config_file)
 
-    name=config.get("name", "AI")
+    name = config.get("name", "AI")
     model = config["model"]
 
     logger = Logger(f"llm_client_chat-{name}")
@@ -66,19 +65,6 @@ def run_chat(config_file):
     if system_prompt:
         messages.append({"role": "system", "content": system_prompt})
         logger.info(f"System prompt: {messages}")
-    # response = make_request(model, messages, logger)
-
-
-    # try:
-    #     message = response["message"]
-    # except Exception:
-    #     logger.error(f"Response: {response}")
-    #     print(f"Response: {response}")
-    #     exit(1)
-    
-    # content = message["content"]
-    # print_response(content, name)
-    # messages.append(message)
 
     try:
         while True:
@@ -91,16 +77,51 @@ def run_chat(config_file):
             response = make_request(model, messages, logger)
             message = response["message"]
             content = message["content"]
-            # if content.strip().startswith("EXECUTE_COMMAND:"):
-            #     match = re.search(r'`.*`', content)
-            #     if match:
-            #         cmd = match.group(0).replace("`", "")
-            #         print("COMMAND:", cmd)
-            #         process = subprocess.Popen(cmd.split(" "), stdout=subprocess.PIPE)
-            #         print(process.stdout.read())
             print_response(content, name)
 
             messages.append(message)
+
+    except KeyboardInterrupt as e:
+        print("Quitting now")
+        sys.exit(1)
+
+
+def run_completion(config_file, prompt):
+    config = read_config(config_file)
+
+    name = config.get("name", "AI")
+    model = config["model"]
+
+    logger = Logger(f"llm_client_chat-{name}")
+
+    logger.info(f"Config: {config}")
+    system_prompt = config.get("system-prompt", "").format(name=name)
+    logger.info(f"System prompt: {system_prompt}")
+    try:
+        r = requests.get(BASE_URL)
+        r.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(
+            "Could not connect to the chat server. Please make sure the server is running."
+        )
+        exit(1)
+
+    print(f"Starting {model}...")
+    messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
+        logger.info(f"System prompt: {messages}")
+
+    try:
+
+        messages.append({"role": "user", "content": prompt})
+        print("...")
+
+        logger.info(f"Before send messages: {messages}")
+        response = make_request(model, messages, logger)
+        message = response["message"]
+        content = message["content"]
+        print_response(content, name)
 
     except KeyboardInterrupt as e:
         print("Quitting now")
