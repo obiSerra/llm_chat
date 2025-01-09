@@ -4,20 +4,15 @@
 
 ## Setup 
 
-- Create and activate a `venv`
-- Run `$ pip install -r requirements.txt`
-- Run `$ pip install -e .`
-- Create an `.env` file using the `env-SAMPLE` as model
-- Fetch the models using `scripts/pull-models.sh`
+- Start both the frontend and backend running
 
+```
+bash ./scripts/start.sh
+```
+and
+```
+bash ./scripts/start-ui.sh
+```
 
-## Run
-
-Run `$ bash chat.sh`
-
-or use a specific configuration with 
-`$ bash chat.sh --config <config-file-name>`
-
-eg:
-
-`$ bash chat.sh --config hal9001` if you have a `hal9001.json` config file in the project root
+- create a `model.json` file with the list of models you want to pull
+- run `bash ./scripts/pull-models.sh` to download all the models
