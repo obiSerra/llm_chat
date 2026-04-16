@@ -8,4 +8,4 @@ if [ -z "$MODEL_NAME" ]; then
     exit 1
 fi
 
-curl -X DELETE http://localhost:11434/api/delete -d '{"model": "'$MODEL_NAME'"}'
+curl -X DELETE http://localhost:11434/api/pull -d '{"name": "'$MODEL_NAME'"}'
