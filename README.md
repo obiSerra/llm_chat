@@ -1,23 +1,43 @@
+# Ollama Scripts
+
+A collection of bash scripts for managing and interacting with Ollama models.
+
+## Scripts
+
+- **benchmark-model.sh** - Benchmark an Ollama model's performance. Requires the model name as an argument. Accepts an optional custom prompt for benchmarking.
+- **chat.sh** - Start an interactive chat session with an Ollama model. Defaults to `llama3.2:1b` if no model is specified.
+- **install-model.sh** - Download and install a model from ollama.com. Requires the model name as an argument.
+- **list-models.sh** - Display all installed Ollama models with their sizes.
+- **remove-model.sh** - Delete an installed model. Requires the model name as an argument.
+
 ## Requirements
 
-- ollama installed (via docker)
+- [Ollama](https://ollama.ai) installed and running locally on `http://localhost:11434`
+- `bash`, `curl`, and `bc` for script execution
 
-## Setup 
+## Quick Start
 
-- Create and activate a `venv`
-- Run `$ pip install -r requirements.txt`
-- Run `$ pip install -e .`
-- Create an `.env` file using the `env-SAMPLE` as model
-- Fetch the models using `scripts/pull-models.sh`
+1. Install a model:
+   ```bash
+   ./scripts/install-model.sh llama3.2:1b
+   ```
 
+2. Start chatting:
+   ```bash
+   ./scripts/chat.sh
+   ```
 
-## Run
+3. View installed models:
+   ```bash
+   ./scripts/list-models.sh
+   ```
 
-Run `$ bash chat.sh`
+4. Benchmark a model:
+   ```bash
+   ./scripts/benchmark-model.sh llama3.2:1b
+   ```
 
-or use a specific configuration with 
-`$ bash chat.sh --config <config-file-name>`
-
-eg:
-
-`$ bash chat.sh --config hal9001` if you have a `hal9001.json` config file in the project root
+5. Remove a model:
+   ```bash
+   ./scripts/remove-model.sh llama3.2:1b
+   ```
